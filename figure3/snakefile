@@ -1,0 +1,57 @@
+### Snakemake workflow to run RFMIX2 for local ancestry inference
+### RFMix2 manual: https://github.com/slowkoni/rfmix/blob/master/MANUAL.md
+
+WD = "./" # working directory to direct output
+out_prefix = "LF" # prefix of output files
+VCF_query = "LF.filtered.vcf.gz" 
+VCF_reference = "AF_WHG2.filtered.vcf.gz"
+sample_map = "AF_WHG2.filtered.samplemap"
+genetic_map = "genetic_maps.b37.txt" # from https://github.com/odelaneau/shapeit4/tree/master/maps
+
+# Set RFmix extra options
+rfmix_options = "-e 10 --reanalyze-reference " 
+
+# Set chromosomes to test
+chromosomes = list(range(1,23))
+
+# Set generations
+generations = [22] 
+
+#############################################################
+
+# Get the sample names
+import pysam
+vcf_file = pysam.VariantFile(VCF_query)
+samples = list(vcf_file.header.samples)
+
+rule all:
+    input:
+        expand(WD + "/" + out_prefix + ".chr{chrom}.G{generation}.msp.tsv", chrom=chromosomes, generation=generations),
+        expand(WD + "/" + out_prefix + ".{sample}.G{generation}.pdf", sample=samples, generation=generations)
+
+rule RFmix:
+    input:
+        vcf_query = VCF_query,
+        vcf_ref =  VCF_reference,
+        sample_map = sample_map,
+        genetic_map = genetic_map,
+    output: 
+        msp = f"{WD}/{out_prefix}.chr{{chrom}}.G{{generation}}.msp.tsv",
+        sis = f"{WD}/{out_prefix}.chr{{chrom}}.G{{generation}}.sis.tsv",
+        fb =  f"{WD}/{out_prefix}.chr{{chrom}}.G{{generation}}.fb.tsv",
+        Q =   f"{WD}/{out_prefix}.chr{{chrom}}.G{{generation}}.rfmix.Q",
+    params:
+        prefix = f"{WD}/{out_prefix}.chr{{chrom}}.G{{generation}}" 
+    threads: 8
+    shell: """
+        rfmix {rfmix_options} \
+        -f {input.vcf_query} \
+        -r {input.vcf_ref} \
+        -m {input.sample_map} \
+        -g {input.genetic_map} \
+        -o {params.prefix} \
+        -G {wildcards.generation} \
+        --n-threads={threads} \
+        --chromosome={wildcards.chrom}
+
+        """
