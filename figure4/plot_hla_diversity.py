@@ -160,8 +160,8 @@ for k, i in dict_cols.items():
         if len(dfs0) > 0:
             for b in range(100): # bootstrapping
                 dfs0b = dfs0.sample(n=resample_size*2, replace=True, weights="Frequency")
-                dfs2b = pd.DataFrame(dfs0b.HLA.value_counts())
-                counts_b = list(dfs2b.HLA)
+                dfs2b = dfs0b.groupby("HLA").agg(counts=("HLA","count"))
+                counts_b = list(dfs2b.counts)
                 H_b = alpha_diversity('shannon', counts_b, base=math.e).values[0]
                 shannon_l.append([k,g,H_b,f"Bootstrap{b}",resample_size])
 
