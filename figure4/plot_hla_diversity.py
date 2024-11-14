@@ -148,9 +148,9 @@ for k, i in dict_cols.items():
     # identify the pop with smallest sample size for each allele
     dfs = df[[group_col,"Sample ID"]+i]
     dfs = dfs[ (~dfs[i[0]].isna() ) & (~dfs[i[1]].isna()) ] # remove nans
-    gsize = pd.DataFrame(dfs[group_col].value_counts()).sort_values([group_col], ascending = True).reset_index() # get group sizes
-    resample_size = gsize[group_col][0] 
-    smalles_n_g = gsize["index"][0]
+    gsize = dfs.groupby("Group").agg(counts=("Sample ID", "count")).sort_values(["counts"]).reset_index()
+    resample_size = gsize["counts"][0]
+    smalles_n_g = gsize[group_col][0] 
     print("="*50)
     print(f"Group with smallest sample size for {k}: {smalles_n_g} (n={resample_size})")
     
