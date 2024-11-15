@@ -16,5 +16,5 @@ To generate the plots, you can either:
 The script requires the following input file:
 
 - **HLA Genotype and Frequency Data** (`../data/hla_calls.xlsx`): This file includes two sheets:
-  - **Sheet "genotypes"**: Contains HLA genotypes from our study, from Immel et al. (2021), and from the 1000 Genomes Project. The 1000 Genomes HLA data can be accessed [here](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/HLA_types/20181129_HLA_types_full_1000_Genomes_Project_panel.txt).
+  - **Sheet "genotypes"**: Contains HLA genotypes from our study, from [Immel et al. (2021)](https://www.nature.com/articles/s42003-020-01627-4), and from the [1000 Genomes Project](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/HLA_types/20181129_HLA_types_full_1000_Genomes_Project_panel.txt).
   - **Sheet "allelefrequencies.net"**: Provides allele frequency data for modern Germans, available on [Allele Frequencies Net](https://www.allelefrequencies.net/pop6001c.asp?pop_id=3767).
