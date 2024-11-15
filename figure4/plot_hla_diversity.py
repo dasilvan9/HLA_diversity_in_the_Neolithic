@@ -14,6 +14,7 @@ from skbio.diversity import alpha_diversity # 0.5.8
 import plotly.express as px # 5.10.0
 import plotly.io as pio
 pio.renderers.default='svg'
+import plotly.graph_objects as go
 
 #%% Load tables
 
@@ -141,6 +142,8 @@ dfu = pd.concat( dict_dfs.values() ) # merge dfs
 # df[group_col].value_counts()
                     
 
+
+
 # generate Shannon index for diversity (H')
 shannon_l = []
 
@@ -183,7 +186,8 @@ fig = px.box(shannon,
              color_discrete_sequence=list(plot_order.values()),
              category_orders={"Group": plot_order.keys()} , 
              facet_col_wrap=3,
-             labels={"Group":"Population"}
+             # labels={"Group":"Population"},
+             labels={"Group":""},
              )
 
 
@@ -192,6 +196,7 @@ fig.for_each_annotation(lambda a: a.update(text=a.text.replace("facet_col=",""))
 
 
 fig.update_layout(
+    
     # autosize=False,
     width=700,  # 800
     height=500, # 1300
@@ -217,7 +222,7 @@ fig.update_layout(
     
 
 fig.update_xaxes(title_text="", showticklabels=False)
-fig.update_yaxes(title_text="")
+# fig.update_yaxes(title_text="")
 
 
 fig.update_xaxes(showline = True, linecolor = 'black', linewidth = 1,  mirror = True,
@@ -236,6 +241,42 @@ fig.update_traces(
                 # line=dict(width=0.19, color='black', )
                 )
     )
+
+
+# custom legend
+
+for trace in fig.data:
+    if isinstance(trace, go.Box):  
+        trace.showlegend = False
+        
+        
+for group, color in plot_order.items():
+    fig.add_trace(
+        go.Box(
+            x=[None],
+            y=[None],
+            # mode="markers",
+            marker=dict( color=color),
+            name=group,  
+            legendgroup="Ancient" if group in ["EF", "LF"] else "Modern",
+            legendgrouptitle=dict(text="Ancient") if group in ["EF", "LF"] else dict(text="Modern"),
+            showlegend=True,
+        )
+    )
+
+# Ensure layout accommodates the legend
+fig.update_layout(
+    legend=dict(
+        orientation="v",
+        yanchor="top",
+        y=1,
+        xanchor="right",
+        x=1.2,
+    )
+)
+
+
+
 
 # fig.show()
 # fig.show(renderer="browser")
